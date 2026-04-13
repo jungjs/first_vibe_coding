@@ -1,2 +1,29 @@
 # Excel 임시 파일
 ~$*
+
+# Backend
+backend/.gradle/
+backend/build/
+backend/out/
+*.class
+*.jar
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+*.env
+.env.*
+!.env.*.example

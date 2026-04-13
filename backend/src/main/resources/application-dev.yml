@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sntl_db
+    username: sntl
+    password: sntl1234
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: sntl-dev-secret-key-must-be-at-least-256-bits-long-for-hs256
+  access-token-expiry: 1800000    # 30분
+  refresh-token-expiry: 604800000 # 7일
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: sntl-minio
+  secret-key: sntl-minio-secret
+  bucket-name: sntl-files
