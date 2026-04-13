@@ -1,0 +1,75 @@
+========================================
+SNTL 통합 물류 플랫폼 작업 로그
+========================================
+
+[작업일: 2026-04-13]
+
+----------------------------------------
+[1] 로컬 파일 GitHub 업로드
+----------------------------------------
+- 작업 내용: 로컬 파일을 GitHub 저장소(jungjs/first_vibe_coding)에 최초 업로드
+- 수행 내용:
+  * git init 및 remote 설정
+  * .gitignore 생성 (Excel 임시 파일 ~$* 제외)
+  * 초기 커밋 및 push
+- 업로드 파일:
+  * SNTL통합플랫폼_기능정리.xlsx
+  * 공항코드집.xlsx
+  * 외교부_국가표준코드_20251222.xlsx
+  * 항공사코드집.xlsx
+  * 해양수산부_국가 및 항구코드_20250731.xlsx
+
+----------------------------------------
+[2] 개발 기본 계획 수립 및 project.md 저장
+----------------------------------------
+- 작업 내용: SNTL통합플랫폼_기능정리.xlsx 분석 후 개발 계획 수립
+- 수행 내용:
+  * 기능 도메인 7개 분류 (회원/인증, 오더, 운송, 창고, Tracking, 회계, 시스템관리)
+  * 기술 스택 확정 (Java 21, Spring Boot 3.x, Next.js 14+, PostgreSQL 16 등)
+  * 비즈니스 로직 확정 (운송비 계산식, Extra Charge, 법인 심사 프로세스)
+  * 개발 Phase 4단계 정의
+  * 개발 폴더 구조 설계 (모노레포: backend / frontend / infra)
+- 생성 파일:
+  * project.md
+
+----------------------------------------
+[3] Phase 1 프로젝트 환경 셋업
+----------------------------------------
+- 작업 내용: project.md Phase 1 기반 구축 - 프로젝트 환경 셋업
+- 수행 내용:
+  * 모노레포 디렉토리 구조 생성
+  * Backend 기반 코드 생성 (Spring Boot 3.3 / Java 21)
+  * Frontend 기반 코드 생성 (Next.js 14+ / TypeScript)
+  * Docker Compose 설정 (PostgreSQL 16, Redis 7, MinIO)
+  * Flyway V1 초기 스키마 작성
+  * GitHub Actions CI/CD 파이프라인 구성
+- 생성 파일:
+  * backend/build.gradle.kts
+  * backend/settings.gradle.kts
+  * backend/Dockerfile
+  * backend/src/main/java/com/sntl/platform/SntlApplication.java
+  * backend/src/main/java/com/sntl/platform/global/config/SecurityConfig.java
+  * backend/src/main/java/com/sntl/platform/global/config/JpaConfig.java
+  * backend/src/main/java/com/sntl/platform/global/config/RedisConfig.java
+  * backend/src/main/java/com/sntl/platform/global/exception/ErrorCode.java
+  * backend/src/main/java/com/sntl/platform/global/exception/BusinessException.java
+  * backend/src/main/java/com/sntl/platform/global/exception/GlobalExceptionHandler.java
+  * backend/src/main/java/com/sntl/platform/global/response/ApiResponse.java
+  * backend/src/main/resources/application.yml
+  * backend/src/main/resources/application-dev.yml
+  * backend/src/main/resources/application-prod.yml
+  * backend/src/main/resources/db/migration/V1__init_schema.sql
+  * frontend/package.json
+  * frontend/next.config.ts
+  * frontend/tailwind.config.ts
+  * frontend/tsconfig.json
+  * frontend/Dockerfile
+  * frontend/.env.local.example
+  * frontend/src/lib/api/client.ts
+  * frontend/src/lib/store/authStore.ts
+  * infra/docker-compose.yml
+  * .github/workflows/backend-ci.yml
+  * .github/workflows/frontend-ci.yml
+  * .gitignore (업데이트)
+
+========================================
