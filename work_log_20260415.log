@@ -1,0 +1,45 @@
+========================================
+SNTL 통합 물류 플랫폼 작업 로그
+========================================
+
+[작업일: 2026-04-15]
+
+----------------------------------------
+[1] project.md Phase 진행상황 업데이트 (work_log 저장 규칙 수립)
+----------------------------------------
+- 작업 내용: 매 작업 완료 후 work_log_YYYYMMDD.log에 결과 기록 규칙 수립
+- 수행 내용:
+  * MEMORY.md, feedback_work_log.md 생성 (자동 기억 등록)
+  * 기존 작업 3건 work_log_20260413.log에 소급 기록
+  * project.md Phase 1 완료 항목 체크 표시
+    - [x] 프로젝트 환경 셋업 ✅ 2026-04-13
+    - [x] DB 설계 및 Flyway 마이그레이션 초기화 ✅ 2026-04-13
+- 수정/생성 파일:
+  * work_log_20260413.log (신규)
+  * project.md (Phase 1 체크 업데이트)
+
+----------------------------------------
+[2] Data Dictionary (DD) 전체 설계 및 Excel 생성
+----------------------------------------
+- 작업 내용: 전체 DB 테이블 설계 기반 Data Dictionary Excel 파일 생성 (방법B)
+- 수행 내용:
+  * 전체 37개 테이블 컬럼 정의 완성
+  * Excel 자동 생성 (Python 3.12 + openpyxl)
+  * 도메인별 색상 구분, PK/FK 색상 표시, 목차 하이퍼링크 적용
+- 도메인별 테이블 목록:
+  * 회원/인증 (8개): individual_member, corporate, corporate_attachment,
+                     corporate_manager, department, department_manager,
+                     refresh_token, member_grade_policy
+  * 코드관리 (7개): country_code, airport_code, port_code, airline_code,
+                   courier_company, code_group, common_code
+  * 오더관리 (5개): orders, shipper_info, consignee_info, cargo_info, order_service
+  * 운송관리 (2개): master_order, transport_schedule
+  * 창고관리 (2개): warehouse_receipt, warehouse_release
+  * Tracking  (2개): tracking_info, customs_declaration
+  * 회계/청구 (7개): invoice, invoice_item, payment, transport_cost_master,
+                     member_discount, tax_invoice (+ 추후 세금계산서)
+  * 시스템관리 (5개): notification, voc, menu, role, menu_role
+- 생성 파일:
+  * SNTL_DataDictionary.xlsx
+
+========================================
