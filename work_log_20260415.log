@@ -134,3 +134,24 @@ SNTL 통합 물류 플랫폼 작업 로그
   * gen_uilist.py, gen_ppt.py     (생성 스크립트)
 
 ========================================
+
+----------------------------------------
+[8] Excel 3종 마크다운 변환
+----------------------------------------
+- 작업 내용: Claude가 참조 가능하도록 기존 Excel 설계문서 3종을 Markdown으로 변환
+- 수행 내용:
+  * SNTL_DataDictionary.xlsx → SNTL_DataDictionary.md
+    - 37개 테이블 전체 컬럼 정의 (도메인 8개 분류)
+    - Enum 값, 상태 흐름, 운송비 계산식 포함
+  * SNTL_FeatureList.xlsx → SNTL_FeatureList.md
+    - L1~L4 기능 트리 144개 항목 전체 기술
+    - Phase별 요약, 사용자권한별 접근 매트릭스 포함
+  * SNTL_ProcessDefinition.xlsx → SNTL_ProcessDefinition.md
+    - P01~P13 업무 프로세스 정의서 13개 전체
+    - 주요 비즈니스 규칙 요약 (번호채번, 보안, Soft Delete, Tracking) 포함
+- 생성 파일:
+  * SNTL_DataDictionary.md
+  * SNTL_FeatureList.md
+  * SNTL_ProcessDefinition.md
+
+========================================
