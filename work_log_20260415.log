@@ -115,3 +115,22 @@ SNTL 통합 물류 플랫폼 작업 로그
   * CLAUDE.md
 
 ========================================
+
+----------------------------------------
+[7] UI목록 및 UI화면설계서 작성
+----------------------------------------
+- 작업 내용: SNTL_DataDictionary.xlsx, SNTL_FeatureList.xlsx, SNTL_ProcessDefinition.xlsx 분석 후 UI목록 및 UI화면설계서 생성
+- 수행 내용:
+  * 3개 Excel 파일 전체 분석 (48개 기능, 13개 프로세스, 38개 테이블)
+  * 10개 대분류 / 48개 화면 도출 및 UI 목록 정의
+  * SCR-001 ~ SCR-099 화면ID 체계 확립
+  * PPT 와이어프레임 27슬라이드 (표지, 목차, 섹션타이틀, 주요화면 상세) 제작
+  * HTML 와이어프레임 Figma 참조문서 작성 (인터랙티브 프리뷰)
+  * PostgreSQL 환경 변경 (211.192.207.172:45432 / jeongdb / aventusm)
+- 생성 파일:
+  * SNTL_UIList.xlsx         (UI 화면 목록 Excel - 48개 화면, 요약통계 포함)
+  * SNTL_UI화면설계서.pptx   (UI 화면설계서 PPT - 27슬라이드 와이어프레임)
+  * SNTL_UI화면설계서_Figma.html  (Figma 참조용 HTML 와이어프레임)
+  * gen_uilist.py, gen_ppt.py     (생성 스크립트)
+
+========================================
