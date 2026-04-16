@@ -136,6 +136,33 @@ SNTL 통합 물류 플랫폼 작업 로그
 ========================================
 
 ----------------------------------------
+[9] API 목록 및 API 정의서 작성
+----------------------------------------
+- 작업 내용: 화면-백엔드 연결을 위한 API 목록 및 상세 API 정의서 생성 (MD + Excel)
+- 수행 내용:
+  * DataDictionary.md, FeatureList.md, ProcessDefinition.md 분석
+  * 전체 도메인 16개, 총 143개 API 도출 및 정의
+  * API ID 체계 수립 (API-A01~R20)
+  * Method별 색상 구분 (GET/POST/PUT/PATCH/DELETE)
+  * Phase별 분류 (Phase 1~4)
+  * 권한 코드 체계 정의 (PUBLIC/AUTH/ADMIN/SELF/CORP 등)
+  * 공통 에러코드 17종 정의
+  * 주요 API 상세 스펙 (Request/Response Body, ErrorCode)
+- 도메인별 API 수:
+  * 인증(7), 회원-개인(5), 회원-법인(10), 회원-담당자(4), 회원-부서(8), 회원-등급(4)
+  * 오더(15), 마스터오더(8), 창고(7)
+  * Tracking(6), 회계/청구(12), 원가(10)
+  * 알림(4), VOC(6), 시스템(17), 기준코드(20)
+- 생성 파일:
+  * SNTL_APIList.md    (API 목록 전체 테이블 + 공통 규칙)
+  * SNTL_APISpec.md    (API 상세 정의서 - Request/Response Body 포함)
+  * SNTL_APIList.xlsx  (3시트: API목록+도메인통계+권한범례)
+  * SNTL_APISpec.xlsx  (도메인별 16시트 + 에러코드 시트)
+  * gen_apiexcel.py    (Excel 생성 스크립트)
+
+========================================
+
+----------------------------------------
 [8] Excel 3종 마크다운 변환
 ----------------------------------------
 - 작업 내용: Claude가 참조 가능하도록 기존 Excel 설계문서 3종을 Markdown으로 변환
