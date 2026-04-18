@@ -1,6 +1,6 @@
 # SNTL 통합 물류 플랫폼 — API 정의서
 
-> Base URL: `http://localhost:8080/api/v1` | 최종 업데이트: 2026-04-16
+> Base URL: `http://localhost:8080/api/v1` | 최종 업데이트: 2026-04-18
 
 ---
 
@@ -1734,6 +1734,458 @@
 | 409 Conflict | 중복 또는 상태 충돌 |
 | 423 Locked | 계정 잠금 |
 | 500 Internal Server Error | 서버 내부 오류 |
+
+---
+
+# 14. 기초정보관리 (BASIC-INFO)
+
+---
+
+## API-FR01 · 개인회원 등급별 운임요율 목록
+
+| 항목 | 내용 |
+|---|---|
+| Method | GET |
+| URL | `/fare-rates/individual` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN, OPERATOR |
+| 설명 | 개인회원 등급(BASIC/SILVER/GOLD/VIP)별 운임요율(%) 목록 조회 |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "data": [
+    { "rateId": 1, "memberGrade": "BASIC",  "fareRate": 0.0  },
+    { "rateId": 2, "memberGrade": "SILVER", "fareRate": 3.0  },
+    { "rateId": 3, "memberGrade": "GOLD",   "fareRate": 5.0  },
+    { "rateId": 4, "memberGrade": "VIP",    "fareRate": 10.0 }
+  ],
+  "message": "성공"
+}
+```
+
+---
+
+## API-FR02 · 개인회원 운임요율 등록
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/fare-rates/individual` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+
+**Request Body**
+```json
+{
+  "memberGrade": "SILVER",
+  "fareRate": 3.0
+}
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| memberGrade | String | Y | BASIC / SILVER / GOLD / VIP |
+| fareRate | Decimal | Y | 운임요율 (%) — 소수점 1자리 |
+
+**Response 201**
+```json
+{
+  "success": true,
+  "data": { "rateId": 2, "memberGrade": "SILVER", "fareRate": 3.0 },
+  "message": "운임요율이 등록되었습니다"
+}
+```
+
+---
+
+## API-FR05 · 법인회원별 운임요율 목록
+
+| 항목 | 내용 |
+|---|---|
+| Method | GET |
+| URL | `/fare-rates/corporate` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN, OPERATOR |
+
+**Query Parameters**
+
+| 파라미터 | 타입 | 설명 |
+|---|---|---|
+| corporateId | Long | 법인 ID 필터 |
+| keyword | String | 법인명 검색 |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "data": [
+    { "rateId": 1, "corporateId": 1, "corpName": "(주)ABC물류", "fareRate": 7.5 }
+  ],
+  "message": "성공"
+}
+```
+
+---
+
+## API-EX01 · 환율 조회
+
+| 항목 | 내용 |
+|---|---|
+| Method | GET |
+| URL | `/exchange-rates` |
+| 인증 | Bearer Token |
+| 설명 | 국가관리에 등록된 국가 환율 조회. 기준: 서울외국환중개소 영업일 오전 8시 |
+
+**Query Parameters**
+
+| 파라미터 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| currencyCode | String | N | 특정 화폐코드 필터 (예: USD, JPY) |
+
+**Response 200**
+```json
+{
+  "success": true,
+  "data": [
+    { "currencyCode": "USD", "currencyName": "미국 달러", "baseRate": 1380.50, "updatedAt": "2026-04-18T08:00:00" },
+    { "currencyCode": "JPY", "currencyName": "일본 엔",   "baseRate": 9.23,   "updatedAt": "2026-04-18T08:00:00" }
+  ],
+  "message": "성공"
+}
+```
+
+---
+
+## API-EX02 · 환율 연계 (서울외국환중개소)
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/exchange-rates/sync` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+| 설명 | 서울외국환중개소 API 호출하여 당일 기준환율 갱신. 배치 스케줄러 또는 수동 실행 |
+
+**Request Body** — 없음
+
+**Response 200**
+```json
+{
+  "success": true,
+  "data": { "syncedCount": 15, "syncedAt": "2026-04-18T08:00:00" },
+  "message": "환율이 갱신되었습니다"
+}
+```
+
+---
+
+## API-AT02 · 항공운송수단 등록
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/transports/air` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+| 설명 | 항공편 단위 운송수단 등록. 운항 스케줄·운송원가 연계 기준 |
+
+**Request Body**
+```json
+{
+  "originCountryCode": "KR",
+  "originAirportCode": "ICN",
+  "destCountryCode": "US",
+  "destAirportCode": "JFK",
+  "flightName": "인천-뉴욕 노선"
+}
+```
+
+**Response 201**
+```json
+{
+  "success": true,
+  "data": {
+    "transportId": 1,
+    "originAirportCode": "ICN",
+    "destAirportCode": "JFK",
+    "flightName": "인천-뉴욕 노선"
+  },
+  "message": "항공운송수단이 등록되었습니다"
+}
+```
+
+---
+
+## API-AT06 · 항공 운송원가 등록
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/transports/air/{transportId}/costs` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+| 설명 | 부피기준(X·Y·Z cm, 원가USD) 및 중량기준(Kg, 원가USD) 운송원가 등록 |
+
+**Request Body**
+```json
+{
+  "costType": "VOLUME",
+  "dimX": 30.0,
+  "dimY": 20.0,
+  "dimZ": 15.0,
+  "costUsd": 25.00
+}
+```
+
+또는 중량기준:
+```json
+{
+  "costType": "WEIGHT",
+  "weightKg": 10.0,
+  "costUsd": 15.00
+}
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| costType | String | Y | VOLUME (부피기준) / WEIGHT (중량기준) |
+| dimX/Y/Z | Decimal | VOLUME 시 Y | 가로·세로·높이 (cm) |
+| weightKg | Decimal | WEIGHT 시 Y | 중량 (kg) |
+| costUsd | Decimal | Y | 운송원가 (USD) |
+
+**Response 201**
+```json
+{
+  "success": true,
+  "data": { "costId": 1, "transportId": 1, "costType": "VOLUME", "costUsd": 25.00 },
+  "message": "운송원가가 등록되었습니다"
+}
+```
+
+---
+
+## API-ST02 · 해운운송수단 등록
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/transports/sea` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+
+**Request Body**
+```json
+{
+  "originCountryCode": "KR",
+  "originPortCode": "KRPUS",
+  "destCountryCode": "US",
+  "destPortCode": "USLAX",
+  "vesselName": "부산-LA 노선"
+}
+```
+
+**Response 201** — 항공운송수단 등록과 동일 구조
+
+---
+
+## API-CB02 · 통관사 등록
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/customs-brokers` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+| 설명 | 국가·운송구분(AIR/SEA)·입항코드(공항/항구) 기준 통관사 등록 |
+
+**Request Body**
+```json
+{
+  "countryCode": "US",
+  "serviceType": "AIR",
+  "entryCode": "JFK",
+  "brokerName": "US Air Customs Co.",
+  "apiIntegration": "OFF"
+}
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| countryCode | String | Y | 국가코드 |
+| serviceType | String | Y | AIR / SEA |
+| entryCode | String | Y | AIR: 공항코드, SEA: 항구코드 |
+| brokerName | String | Y | 통관사명 |
+| apiIntegration | String | Y | ON / OFF |
+
+**Response 201**
+```json
+{
+  "success": true,
+  "data": { "brokerId": 1, "brokerName": "US Air Customs Co.", "serviceType": "AIR" },
+  "message": "통관사가 등록되었습니다"
+}
+```
+
+---
+
+## API-CB06 · 통관원가 등록
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/customs-brokers/{brokerId}/costs` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+| 설명 | 통관사별 부피/중량기준 통관원가 등록 |
+
+**Request Body** — 항공 운송원가 등록(API-AT06)과 동일 구조
+
+---
+
+## API-CW02 · 택배배송장 등록
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/codes/couriers/{courierId}/waybills` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN |
+| Content-Type | multipart/form-data |
+| 설명 | 국가별 택배사 배송장 출력 양식(BLOB) 등록 |
+
+**Form Data**
+
+| 필드 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| countryCode | String | Y | 배송장 적용 국가코드 |
+| waybillFile | MultipartFile | Y | 배송장 양식 파일 (PDF/XLSX, 최대 20MB) |
+| description | String | N | 배송장 설명 |
+
+**Response 201**
+```json
+{
+  "success": true,
+  "data": {
+    "waybillId": 1,
+    "courierId": 1,
+    "countryCode": "US",
+    "fileName": "CJ_US_waybill.pdf",
+    "fileSize": 512000,
+    "uploadedAt": "2026-04-18T10:00:00"
+  },
+  "message": "택배배송장이 등록되었습니다"
+}
+```
+
+---
+
+## API-PP02 · 선불금 충전 요청
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/prepaid/charge-request` |
+| 인증 | Bearer Token |
+| 권한 | 인증된 모든 사용자 (개인/법인관리자) |
+| 설명 | 입금 완료 후 충전 금액 입력하여 관리자 확인 요청 |
+
+**Request Body**
+```json
+{
+  "chargeAmount": 100000.00,
+  "depositDate": "2026-04-18",
+  "depositorName": "홍길동",
+  "memo": "4월 선불금 충전"
+}
+```
+
+**Response 201**
+```json
+{
+  "success": true,
+  "data": {
+    "requestId": 1,
+    "chargeAmount": 100000.00,
+    "status": "PENDING",
+    "createdAt": "2026-04-18T10:00:00"
+  },
+  "message": "충전 요청이 접수되었습니다. 관리자 확인 후 반영됩니다"
+}
+```
+
+---
+
+## API-PP03 · 선불금 충전 확인 (관리자)
+
+| 항목 | 내용 |
+|---|---|
+| Method | PATCH |
+| URL | `/prepaid/charge-requests/{requestId}/confirm` |
+| 인증 | Bearer Token |
+| 권한 | ADMIN, OPERATOR |
+| 설명 | 실제 입금 확인 후 최종 충전 처리. 회원 잔액에 즉시 반영 |
+
+**Request Body**
+```json
+{
+  "confirmed": true,
+  "memo": "입금 확인 완료"
+}
+```
+
+**Response 200**
+```json
+{
+  "success": true,
+  "data": {
+    "requestId": 1,
+    "memberId": 1,
+    "chargeAmount": 100000.00,
+    "newBalance": 100000.00,
+    "status": "CONFIRMED",
+    "confirmedAt": "2026-04-18T11:00:00"
+  },
+  "message": "충전이 완료되었습니다"
+}
+```
+
+---
+
+## API-PP04 · 환불 요청
+
+| 항목 | 내용 |
+|---|---|
+| Method | POST |
+| URL | `/prepaid/refund-request` |
+| 인증 | Bearer Token |
+| 권한 | 인증된 모든 사용자 (개인/법인관리자) |
+
+**Request Body**
+```json
+{
+  "refundAmount": 50000.00,
+  "bankName": "국민은행",
+  "accountNumber": "123456-78-901234",
+  "accountHolder": "홍길동",
+  "memo": "잔액 환불 요청"
+}
+```
+
+**Response 201**
+```json
+{
+  "success": true,
+  "data": {
+    "refundId": 1,
+    "refundAmount": 50000.00,
+    "status": "PENDING",
+    "createdAt": "2026-04-18T10:00:00"
+  },
+  "message": "환불 요청이 접수되었습니다"
+}
+```
 
 ---
 

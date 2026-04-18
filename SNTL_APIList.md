@@ -39,6 +39,7 @@
 | 회원 - 법인담당자 (MEMBER-MGR) | API-M16 ~ M19 | 4 | 1 |
 | 회원 - 부서 (MEMBER-DEPT) | API-M20 ~ M27 | 8 | 1 |
 | 회원 - 등급정책 (MEMBER-GRADE) | API-M28 ~ M31 | 4 | 1 |
+| **선불금 (PREPAID)** | **API-PP01 ~ PP05** | **5** | **1** |
 | 오더 (ORDER) | API-O01 ~ O15 | 15 | 2 |
 | 마스터오더 (MASTER-ORDER) | API-MO01 ~ MO08 | 8 | 2 |
 | 창고 (WAREHOUSE) | API-W01 ~ W07 | 7 | 2 |
@@ -49,7 +50,13 @@
 | VOC | API-V01 ~ V06 | 6 | 3 |
 | 시스템 (SYSTEM) | API-S01 ~ S17 | 17 | 4 |
 | 기준코드 (CODE) | API-R01 ~ R20 | 20 | 1 |
-| **합계** | | **137** | |
+| **운임요율 (FARE-RATE)** | **API-FR01 ~ FR08** | **8** | **1** |
+| **환율 (EXCHANGE-RATE)** | **API-EX01 ~ EX02** | **2** | **1** |
+| **항공운송수단 (AIR-TRANSPORT)** | **API-AT01 ~ AT07** | **7** | **1** |
+| **해운운송수단 (SEA-TRANSPORT)** | **API-ST01 ~ ST07** | **7** | **1** |
+| **통관사 (CUSTOMS-BROKER)** | **API-CB01 ~ CB07** | **7** | **1** |
+| **택배배송장 (COURIER-WAYBILL)** | **API-CW01 ~ CW04** | **4** | **1** |
+| **합계** | | **182** | |
 
 ---
 
@@ -154,6 +161,97 @@
 | API-O15 | DELETE | /orders/{orderId}/services/{serviceId} | 서비스 삭제 | Y | SELF | 2 |
 
 > **제한**: 창고 입고(WAREHOUSED) 이후 수정/삭제 불가
+
+---
+
+## 7-1. 기초정보관리 — 운임요율 (FARE-RATE)
+
+| API ID | Method | URL | 기능명 | 인증 | 권한 | Phase |
+|---|---|---|---|---|---|---|
+| API-FR01 | GET | /fare-rates/individual | 개인회원 등급별 운임요율 목록 | Y | ADMIN/OPR | 1 |
+| API-FR02 | POST | /fare-rates/individual | 개인회원 운임요율 등록 | Y | ADMIN | 1 |
+| API-FR03 | PUT | /fare-rates/individual/{rateId} | 개인회원 운임요율 수정 | Y | ADMIN | 1 |
+| API-FR04 | DELETE | /fare-rates/individual/{rateId} | 개인회원 운임요율 삭제 | Y | ADMIN | 1 |
+| API-FR05 | GET | /fare-rates/corporate | 법인회원별 운임요율 목록 | Y | ADMIN/OPR | 1 |
+| API-FR06 | POST | /fare-rates/corporate | 법인회원 운임요율 등록 | Y | ADMIN | 1 |
+| API-FR07 | PUT | /fare-rates/corporate/{rateId} | 법인회원 운임요율 수정 | Y | ADMIN | 1 |
+| API-FR08 | DELETE | /fare-rates/corporate/{rateId} | 법인회원 운임요율 삭제 | Y | ADMIN | 1 |
+
+---
+
+## 7-2. 기초정보관리 — 환율 (EXCHANGE-RATE)
+
+| API ID | Method | URL | 기능명 | 인증 | 권한 | Phase |
+|---|---|---|---|---|---|---|
+| API-EX01 | GET | /exchange-rates | 환율 조회 | Y | AUTH | 1 |
+| API-EX02 | POST | /exchange-rates/sync | 환율 연계 (서울외국환중개소) | Y | ADMIN | 1 |
+
+---
+
+## 7-3. 기초정보관리 — 항공운송수단 (AIR-TRANSPORT)
+
+| API ID | Method | URL | 기능명 | 인증 | 권한 | Phase |
+|---|---|---|---|---|---|---|
+| API-AT01 | GET | /transports/air | 항공운송수단 목록 | Y | ADMIN/OPR | 1 |
+| API-AT02 | POST | /transports/air | 항공운송수단 등록 | Y | ADMIN | 1 |
+| API-AT03 | PUT | /transports/air/{transportId} | 항공운송수단 수정 | Y | ADMIN | 1 |
+| API-AT04 | DELETE | /transports/air/{transportId} | 항공운송수단 삭제 | Y | ADMIN | 1 |
+| API-AT05 | GET | /transports/air/{transportId}/costs | 항공 운송원가 조회 | Y | ADMIN/OPR | 1 |
+| API-AT06 | POST | /transports/air/{transportId}/costs | 항공 운송원가 등록 | Y | ADMIN | 1 |
+| API-AT07 | PUT | /transports/air/{transportId}/costs/{costId} | 항공 운송원가 수정 | Y | ADMIN | 1 |
+
+---
+
+## 7-4. 기초정보관리 — 해운운송수단 (SEA-TRANSPORT)
+
+| API ID | Method | URL | 기능명 | 인증 | 권한 | Phase |
+|---|---|---|---|---|---|---|
+| API-ST01 | GET | /transports/sea | 해운운송수단 목록 | Y | ADMIN/OPR | 1 |
+| API-ST02 | POST | /transports/sea | 해운운송수단 등록 | Y | ADMIN | 1 |
+| API-ST03 | PUT | /transports/sea/{transportId} | 해운운송수단 수정 | Y | ADMIN | 1 |
+| API-ST04 | DELETE | /transports/sea/{transportId} | 해운운송수단 삭제 | Y | ADMIN | 1 |
+| API-ST05 | GET | /transports/sea/{transportId}/costs | 해운 운송원가 조회 | Y | ADMIN/OPR | 1 |
+| API-ST06 | POST | /transports/sea/{transportId}/costs | 해운 운송원가 등록 | Y | ADMIN | 1 |
+| API-ST07 | PUT | /transports/sea/{transportId}/costs/{costId} | 해운 운송원가 수정 | Y | ADMIN | 1 |
+
+---
+
+## 7-5. 기초정보관리 — 통관사 (CUSTOMS-BROKER)
+
+| API ID | Method | URL | 기능명 | 인증 | 권한 | Phase |
+|---|---|---|---|---|---|---|
+| API-CB01 | GET | /customs-brokers | 통관사 목록 | Y | ADMIN/OPR | 1 |
+| API-CB02 | POST | /customs-brokers | 통관사 등록 | Y | ADMIN | 1 |
+| API-CB03 | PUT | /customs-brokers/{brokerId} | 통관사 수정 | Y | ADMIN | 1 |
+| API-CB04 | DELETE | /customs-brokers/{brokerId} | 통관사 삭제 | Y | ADMIN | 1 |
+| API-CB05 | GET | /customs-brokers/{brokerId}/costs | 통관원가 조회 | Y | ADMIN/OPR | 1 |
+| API-CB06 | POST | /customs-brokers/{brokerId}/costs | 통관원가 등록 | Y | ADMIN | 1 |
+| API-CB07 | PUT | /customs-brokers/{brokerId}/costs/{costId} | 통관원가 수정 | Y | ADMIN | 1 |
+
+---
+
+## 7-6. 기초정보관리 — 택배사 배송장 (COURIER-WAYBILL)
+
+> 택배사 기본 CRUD는 기존 API-R17~R20 참조. 아래는 배송장 관리 추가 API.
+
+| API ID | Method | URL | 기능명 | 인증 | 권한 | Phase |
+|---|---|---|---|---|---|---|
+| API-CW01 | GET | /codes/couriers/{courierId}/waybills | 택배배송장 목록 | Y | ADMIN/OPR | 1 |
+| API-CW02 | POST | /codes/couriers/{courierId}/waybills | 택배배송장 등록 | Y | ADMIN | 1 |
+| API-CW03 | PUT | /codes/couriers/{courierId}/waybills/{waybillId} | 택배배송장 수정 | Y | ADMIN | 1 |
+| API-CW04 | DELETE | /codes/couriers/{courierId}/waybills/{waybillId} | 택배배송장 삭제 | Y | ADMIN | 1 |
+
+---
+
+## 7-7. 선불금 관리 (PREPAID)
+
+| API ID | Method | URL | 기능명 | 인증 | 권한 | Phase |
+|---|---|---|---|---|---|---|
+| API-PP01 | GET | /prepaid/balance | 선불금 잔액 조회 (본인) | Y | AUTH | 1 |
+| API-PP02 | POST | /prepaid/charge-request | 선불금 충전 요청 | Y | AUTH | 1 |
+| API-PP03 | PATCH | /prepaid/charge-requests/{requestId}/confirm | 충전 확인 (관리자) | Y | ADMIN/OPR | 1 |
+| API-PP04 | POST | /prepaid/refund-request | 환불 요청 | Y | AUTH | 1 |
+| API-PP05 | GET | /prepaid/admin/balances | 전체 선불금 잔액 조회 (관리자) | Y | ADMIN/OPR | 1 |
 
 ---
 

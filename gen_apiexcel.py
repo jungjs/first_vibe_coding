@@ -67,6 +67,7 @@ DOMAIN_COLOR = {
     "회원-담당자":COLOR["domain_member"],
     "회원-부서":  COLOR["domain_member"],
     "회원-등급":  COLOR["domain_member"],
+    "선불금":     "E2EFDA",
     "오더":       COLOR["domain_order"],
     "마스터오더": COLOR["domain_mo"],
     "창고":       COLOR["domain_wh"],
@@ -77,6 +78,12 @@ DOMAIN_COLOR = {
     "VOC":        COLOR["domain_voc"],
     "시스템":     COLOR["domain_sys"],
     "기준코드":   COLOR["domain_code"],
+    "운임요율":   "FFF2CC",
+    "환율":       "FFEB9C",
+    "항공운송수단":"DAEEF3",
+    "해운운송수단":"B8CCE4",
+    "통관사":     "E4DFEC",
+    "택배배송장":  "F2DCDB",
 }
 
 # ──────────────────────────────────────────────
@@ -243,6 +250,53 @@ API_DATA = [
     ["API-R18","기준코드","POST","/codes/couriers","택배사 등록","택배사 등록","Y","ADMIN","1"],
     ["API-R19","기준코드","PUT","/codes/couriers/{id}","택배사 수정","택배사 수정","Y","ADMIN","1"],
     ["API-R20","기준코드","DELETE","/codes/couriers/{id}","택배사 삭제","택배사 삭제","Y","ADMIN","1"],
+    # ── 운임요율
+    ["API-FR01","운임요율","GET","/fare-rates/individual","개인회원 등급별 운임요율 목록","회원등급(BASIC/SILVER/GOLD/VIP)별 운임요율(%) 목록","Y","ADMIN/OPR","1"],
+    ["API-FR02","운임요율","POST","/fare-rates/individual","개인회원 운임요율 등록","등급별 운임요율 등록","Y","ADMIN","1"],
+    ["API-FR03","운임요율","PUT","/fare-rates/individual/{rateId}","개인회원 운임요율 수정","운임요율 수정","Y","ADMIN","1"],
+    ["API-FR04","운임요율","DELETE","/fare-rates/individual/{rateId}","개인회원 운임요율 삭제","운임요율 삭제","Y","ADMIN","1"],
+    ["API-FR05","운임요율","GET","/fare-rates/corporate","법인회원별 운임요율 목록","법인ID별 운임요율 목록","Y","ADMIN/OPR","1"],
+    ["API-FR06","운임요율","POST","/fare-rates/corporate","법인회원 운임요율 등록","법인별 운임요율 등록","Y","ADMIN","1"],
+    ["API-FR07","운임요율","PUT","/fare-rates/corporate/{rateId}","법인회원 운임요율 수정","운임요율 수정","Y","ADMIN","1"],
+    ["API-FR08","운임요율","DELETE","/fare-rates/corporate/{rateId}","법인회원 운임요율 삭제","운임요율 삭제","Y","ADMIN","1"],
+    # ── 환율
+    ["API-EX01","환율","GET","/exchange-rates","환율 조회","서울외국환중개소 기준환율. 로그인 국가코드 기준","Y","AUTH","1"],
+    ["API-EX02","환율","POST","/exchange-rates/sync","환율 연계","서울외국환중개소 API 호출, 영업일 오전 8시 자동 갱신","Y","ADMIN","1"],
+    # ── 항공운송수단
+    ["API-AT01","항공운송수단","GET","/transports/air","항공운송수단 목록","출발/도착 공항코드로 조회","Y","ADMIN/OPR","1"],
+    ["API-AT02","항공운송수단","POST","/transports/air","항공운송수단 등록","출발/도착 공항코드+항공편명 등록","Y","ADMIN","1"],
+    ["API-AT03","항공운송수단","PUT","/transports/air/{transportId}","항공운송수단 수정","항공편명 수정","Y","ADMIN","1"],
+    ["API-AT04","항공운송수단","DELETE","/transports/air/{transportId}","항공운송수단 삭제","운송원가 연결 시 삭제 불가","Y","ADMIN","1"],
+    ["API-AT05","항공운송수단","GET","/transports/air/{transportId}/costs","항공 운송원가 조회","부피/중량기준 운송원가 조회","Y","ADMIN/OPR","1"],
+    ["API-AT06","항공운송수단","POST","/transports/air/{transportId}/costs","항공 운송원가 등록","부피기준(X·Y·Z·USD) 또는 중량기준(Kg·USD)","Y","ADMIN","1"],
+    ["API-AT07","항공운송수단","PUT","/transports/air/{transportId}/costs/{costId}","항공 운송원가 수정","운송원가(USD) 수정","Y","ADMIN","1"],
+    # ── 해운운송수단
+    ["API-ST01","해운운송수단","GET","/transports/sea","해운운송수단 목록","출발/도착 항구코드로 조회","Y","ADMIN/OPR","1"],
+    ["API-ST02","해운운송수단","POST","/transports/sea","해운운송수단 등록","출발/도착 항구코드+해운편명 등록","Y","ADMIN","1"],
+    ["API-ST03","해운운송수단","PUT","/transports/sea/{transportId}","해운운송수단 수정","해운편명 수정","Y","ADMIN","1"],
+    ["API-ST04","해운운송수단","DELETE","/transports/sea/{transportId}","해운운송수단 삭제","운송원가 연결 시 삭제 불가","Y","ADMIN","1"],
+    ["API-ST05","해운운송수단","GET","/transports/sea/{transportId}/costs","해운 운송원가 조회","부피/중량기준 운송원가 조회","Y","ADMIN/OPR","1"],
+    ["API-ST06","해운운송수단","POST","/transports/sea/{transportId}/costs","해운 운송원가 등록","부피기준(X·Y·Z·USD) 또는 중량기준(Kg·USD)","Y","ADMIN","1"],
+    ["API-ST07","해운운송수단","PUT","/transports/sea/{transportId}/costs/{costId}","해운 운송원가 수정","운송원가(USD) 수정","Y","ADMIN","1"],
+    # ── 통관사
+    ["API-CB01","통관사","GET","/customs-brokers","통관사 목록","국가코드·운송구분·입항코드로 조회","Y","ADMIN/OPR","1"],
+    ["API-CB02","통관사","POST","/customs-brokers","통관사 등록","국가코드+서비스구분(AIR/SEA)+입항코드+API연동여부","Y","ADMIN","1"],
+    ["API-CB03","통관사","PUT","/customs-brokers/{brokerId}","통관사 수정","통관사 정보 수정","Y","ADMIN","1"],
+    ["API-CB04","통관사","DELETE","/customs-brokers/{brokerId}","통관사 삭제","통관원가 연결 시 삭제 불가","Y","ADMIN","1"],
+    ["API-CB05","통관사","GET","/customs-brokers/{brokerId}/costs","통관원가 조회","부피/중량기준 통관원가 조회","Y","ADMIN/OPR","1"],
+    ["API-CB06","통관사","POST","/customs-brokers/{brokerId}/costs","통관원가 등록","부피기준(X·Y·Z·USD) 또는 중량기준(Kg·USD)","Y","ADMIN","1"],
+    ["API-CB07","통관사","PUT","/customs-brokers/{brokerId}/costs/{costId}","통관원가 수정","통관원가(USD) 수정","Y","ADMIN","1"],
+    # ── 택배배송장
+    ["API-CW01","택배배송장","GET","/codes/couriers/{courierId}/waybills","택배배송장 목록","국가코드·택배사명으로 조회","Y","ADMIN/OPR","1"],
+    ["API-CW02","택배배송장","POST","/codes/couriers/{courierId}/waybills","택배배송장 등록","국가코드+배송장 양식파일(BLOB) 등록","Y","ADMIN","1"],
+    ["API-CW03","택배배송장","PUT","/codes/couriers/{courierId}/waybills/{waybillId}","택배배송장 수정","배송장 양식파일 수정","Y","ADMIN","1"],
+    ["API-CW04","택배배송장","DELETE","/codes/couriers/{courierId}/waybills/{waybillId}","택배배송장 삭제","배송장 삭제","Y","ADMIN","1"],
+    # ── 선불금
+    ["API-PP01","선불금","GET","/prepaid/balance","선불금 잔액 조회 (본인)","본인 선불금 잔액 조회","Y","AUTH","1"],
+    ["API-PP02","선불금","POST","/prepaid/charge-request","선불금 충전 요청","입금 후 충전 금액 입력, 관리자 확인 요청","Y","AUTH","1"],
+    ["API-PP03","선불금","PATCH","/prepaid/charge-requests/{requestId}/confirm","충전 확인 (관리자)","실제 입금 확인 후 최종 충전 처리, 잔액 반영","Y","ADMIN/OPR","1"],
+    ["API-PP04","선불금","POST","/prepaid/refund-request","환불 요청","미사용 잔액 환불 요청, 환불 계좌정보 입력","Y","AUTH","1"],
+    ["API-PP05","선불금","GET","/prepaid/admin/balances","전체 선불금 조회 (관리자)","회원별·법인별 선불금 잔액 전체 조회","Y","ADMIN/OPR","1"],
 ]
 
 # ──────────────────────────────────────────────
