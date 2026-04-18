@@ -1,6 +1,6 @@
 # SNTL 통합 물류 플랫폼 — UI 화면 목록
 
-> 생성일: 2026-04-16 | 총 **48개** 화면 | `SNTL_UIList.xlsx` 내용 요약
+> 생성일: 2026-04-16 | 최종 업데이트: 2026-04-18 | 총 **58개** 화면 | `SNTL_UIList.xlsx` 내용 요약
 >
 > 컬럼 구조: `화면ID | 화면명 | 사용자유형 | 주요기능 | 관련 API | Phase | 연결화면 | 비고`
 
@@ -11,7 +11,7 @@
 | 대분류 | 화면 수 |
 |--------|---------|
 | 로그인/인증 | 5 |
-| 회원관리 | 5 |
+| 회원관리 | 8 |
 | 오더관리 | 5 |
 | 마스터오더관리 | 3 |
 | 창고관리 | 3 |
@@ -20,11 +20,12 @@
 | VOC관리 | 3 |
 | 고객지원 | 4 |
 | 관리자 | 10 |
-| **합계** | **48** |
+| 기초정보관리 | 7 |
+| **합계** | **58** |
 
 | Phase | 화면 수 |
 |-------|---------|
-| Phase 1 | 14 |
+| Phase 1 | 24 |
 | Phase 2 | 28 |
 | Phase 3 | 6 |
 
@@ -51,6 +52,9 @@
 | SCR-012 | 회원탈퇴 | 회원 | 탈퇴 사유 선택, 본인확인, Soft Delete | `DELETE /api/members/withdraw` | P1 | SCR-010 | 개인정보 Null 처리 |
 | SCR-013 | 법인 마이페이지 | 법인관리자 | 법인정보 조회, 부서/멤버 관리 | `GET /api/members/corporate/me` | P2 | SCR-014 | |
 | SCR-014 | 부서/멤버 관리 | 법인관리자 | 부서 CRUD, 멤버 초대/삭제 | `GET /api/corporate/departments` | P2 | SCR-013 | |
+| SCR-015 | 선불금 관리 | 개인회원/법인관리자 | 잔액 조회, 충전·환불 요청 이력, 버튼 이동 | `GET /api/prepaid/balance` | P1 | SCR-016, SCR-017 | 개인/법인 공통 화면 |
+| SCR-016 | 선불금 충전 요청 | 개인회원/법인관리자 | 충전 금액·입금자명·입금 예정일 입력, 요청 제출 | `POST /api/prepaid/charge` | P1 | SCR-015 | 입금 계좌 안내 표시 |
+| SCR-017 | 선불금 환불 요청 | 개인회원/법인관리자 | 환불 금액·계좌 정보 입력, 잔액 검증 후 요청 | `POST /api/prepaid/refund` | P1 | SCR-015 | 잔액 부족 시 요청 불가 |
 
 ---
 
@@ -158,6 +162,22 @@
 
 ---
 
+## 11. 기초정보관리
+
+> 관리자 전용 화면. 운임요율·환율·운송수단·통관사·선불금 처리 등 플랫폼 기초 데이터 관리.
+
+| 화면ID | 화면명 | 사용자유형 | 주요기능 | 관련 API | Phase | 연결화면 | 비고 |
+|--------|--------|-----------|---------|---------|-------|---------|------|
+| SCR-100 | 선불금 요청 관리 | 관리자 | 충전/환불 요청 목록 조회, PENDING 요청 확인·거부 처리 | `GET /api/prepaid/admin`, `PATCH /api/prepaid/charge/{id}/confirm`, `PATCH /api/prepaid/refund/{id}/confirm` | P1 | | 확인 시 회원 잔액 자동 반영 |
+| SCR-101 | 운임요율 관리 | 관리자 | 개인등급별(BASIC/SILVER/GOLD/VIP) 및 법인별 운임요율 CRUD, 적용기간 설정 | `GET/POST/PUT/DELETE /api/fare-rates` | P1 | | 서비스구분(AIR/SEA/CIR/CCL) 탭 |
+| SCR-102 | 환율 관리 | 관리자 | 최신 환율 목록 조회, 서울외국환중개소 API 수동 연계, 환율 수동 수정 | `GET /api/exchange-rates`, `POST /api/exchange-rates/sync` | P1 | | 영업일 자동 연계 이력 포함 |
+| SCR-103 | 항공운송수단 관리 | 관리자 | 항공 운송구간(출발/도착 국가·공항) CRUD, 구간별 부피·중량기준 운송원가 CRUD | `GET/POST/PUT/DELETE /api/air-transports`, `/api/air-transports/{id}/costs` | P1 | | 편명·원가 탭 분리 |
+| SCR-104 | 해운운송수단 관리 | 관리자 | 해운 운송구간(출발/도착 국가·항구) CRUD, 구간별 부피·중량기준 운송원가 CRUD | `GET/POST/PUT/DELETE /api/sea-transports`, `/api/sea-transports/{id}/costs` | P1 | | 선사명·원가 탭 분리 |
+| SCR-105 | 통관사 관리 | 관리자 | 통관사 CRUD(국가·서비스구분·API연동ON/OFF), 통관원가 CRUD | `GET/POST/PUT/DELETE /api/customs-brokers`, `/api/customs-brokers/{id}/costs` | P1 | | API연동구분 ON/OFF 토글 |
+| SCR-106 | 택배배송장 관리 | 관리자 | 택배사별·국가별 배송장 양식 파일 업로드·다운로드·삭제 | `GET/POST/DELETE /api/courier-waybills` | P1 | SCR-096 | MinIO 파일 저장 |
+
+---
+
 ## 화면 흐름 요약
 
 ### 회원 주요 흐름
@@ -165,6 +185,7 @@
 SCR-004(개인회원가입) → SCR-001(로그인)
   → SCR-020(오더목록) → SCR-021(오더등록) → SCR-023(서비스추가)
   → SCR-050(Tracking) → SCR-060(청구서) → SCR-070(VOC)
+  → SCR-015(선불금관리) → SCR-016(충전요청) / SCR-017(환불요청)
 ```
 
 ### 운영자 주요 흐름
@@ -175,10 +196,18 @@ SCR-090(대시보드) → SCR-092(법인심사)
   → SCR-060(청구서생성) → SCR-062(입금처리)
 ```
 
+### 관리자 기초정보관리 흐름
+```
+SCR-101(운임요율) → SCR-102(환율연계)
+  → SCR-103(항공운송수단) → SCR-104(해운운송수단)
+  → SCR-105(통관사) → SCR-106(택배배송장)
+  → SCR-100(선불금요청확인)
+```
+
 ### 접근 권한 매핑
 | 역할 | 접근 가능 화면 |
 |------|--------------|
-| 개인회원 (INDIVIDUAL) | SCR-001~005, SCR-010~012, SCR-020~024, SCR-050~053, SCR-060~061, SCR-070~072, SCR-080~083 |
+| 개인회원 (INDIVIDUAL) | SCR-001~005, SCR-010~012, SCR-015~017, SCR-020~024, SCR-050~053, SCR-060~061, SCR-070~072, SCR-080~083 |
 | 법인관리자 (CORPORATE) | 개인회원 + SCR-013~014 |
 | 운영자 (OPERATOR) | 회원 전체 + SCR-030~042, SCR-072, SCR-081 |
-| 관리자 (ADMIN) | 전체 화면 |
+| 관리자 (ADMIN) | 전체 화면 (SCR-001~106) |
