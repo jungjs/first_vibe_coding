@@ -62,4 +62,41 @@ SNTL 통합 물류 플랫폼 작업 로그
   * SNTL_APISpec.xlsx (재생성)
   * work_log_20260418.log (신규)
 
+----------------------------------------
+[2] SNTL_DataDictionary 갱신 (기초정보관리 도메인 추가)
+----------------------------------------
+- 작업 내용: 기초정보관리 도메인 신규 추가에 따른 DataDictionary 전면 갱신
+- 수행 내용:
+  * SNTL_DataDictionary.md
+    - 헤더: 총 37개 → 총 50개 테이블
+    - 목차 테이블: No 38~50 신규 추가 (prepaid 2개 + 기초정보관리 11개)
+    - corporate 테이블: balance 컬럼(NUMERIC 15,2 default 0) 추가 (No 11 삽입, 기존 11~14 → 12~15)
+    - 도메인 1 (회원/인증) 말미: prepaid_charge_request, prepaid_refund_request 테이블 정의 추가
+    - 도메인 9 신규 추가: 기초정보관리 (11개 테이블)
+      * individual_fare_rate (개인회원운임요율)
+      * corporate_fare_rate (법인회원운임요율)
+      * exchange_rate (환율)
+      * air_transport (항공운송수단)
+      * air_transport_cost (항공운송원가 — VOLUME/WEIGHT cost_type)
+      * sea_transport (해운운송수단)
+      * sea_transport_cost (해운운송원가)
+      * customs_broker (통관사 — api_integration ON/OFF)
+      * customs_broker_cost (통관원가)
+      * courier_transport_cost (택배사운송원가)
+      * courier_waybill (택배배송장 — MinIO 저장)
+    - Enum 요약: 선불금 충전/환불상태, 운송원가구분, 통관사API연동, 회원타입구분 항목 추가
+  * gen_datadictionary.py (신규 생성)
+    - 50개 테이블 전체 데이터 정의
+    - 목차/도메인별/Enum요약 시트 생성 스크립트
+    - 도메인별 색상 구분, PK/FK 행 하이라이트
+  * SNTL_DataDictionary.xlsx (재생성)
+    - 목차 시트 (50개 테이블 인덱스)
+    - 9개 도메인 시트 (회원/인증 ~ 기초정보관리)
+    - Enum_요약 시트
+- 수정/생성 파일:
+  * SNTL_DataDictionary.md (갱신)
+  * gen_datadictionary.py (신규)
+  * SNTL_DataDictionary.xlsx (재생성)
+  * work_log_20260418.log (갱신)
+
 ========================================

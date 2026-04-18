@@ -1,6 +1,6 @@
 # SNTL 통합 물류 플랫폼 — Data Dictionary
 
-> 총 37개 테이블 | PostgreSQL 16 기준 | 최종 업데이트: 2026-04-16
+> 총 50개 테이블 | PostgreSQL 16 기준 | 최종 업데이트: 2026-04-18
 
 ---
 
@@ -45,6 +45,19 @@
 | 35 | menu | 메뉴 | 시스템관리 |
 | 36 | role | 권한 | 시스템관리 |
 | 37 | menu_role | 메뉴권한매핑 | 시스템관리 |
+| 38 | prepaid_charge_request | 선불금충전요청 | 회원/인증 |
+| 39 | prepaid_refund_request | 선불금환불요청 | 회원/인증 |
+| 40 | individual_fare_rate | 개인회원운임요율 | 기초정보관리 |
+| 41 | corporate_fare_rate | 법인회원운임요율 | 기초정보관리 |
+| 42 | exchange_rate | 환율 | 기초정보관리 |
+| 43 | air_transport | 항공운송수단 | 기초정보관리 |
+| 44 | air_transport_cost | 항공운송원가 | 기초정보관리 |
+| 45 | sea_transport | 해운운송수단 | 기초정보관리 |
+| 46 | sea_transport_cost | 해운운송원가 | 기초정보관리 |
+| 47 | customs_broker | 통관사 | 기초정보관리 |
+| 48 | customs_broker_cost | 통관원가 | 기초정보관리 |
+| 49 | courier_transport_cost | 택배사운송원가 | 기초정보관리 |
+| 50 | courier_waybill | 택배배송장 | 기초정보관리 |
 
 ---
 
@@ -88,10 +101,11 @@
 | 8 | zipcode | 우편번호 | VARCHAR | 10 | - | - | N | - | 법인 주소 우편번호 |
 | 9 | address | 주소 | VARCHAR | 255 | - | - | N | - | 법인 주소 |
 | 10 | address_detail | 상세주소 | VARCHAR | 255 | - | - | N | - | 법인 상세주소 |
-| 11 | approval_status | 심사상태 | VARCHAR | 20 | - | - | Y | PENDING | PENDING/APPROVED/REJECTED |
-| 12 | status | 상태 | VARCHAR | 20 | - | - | Y | INACTIVE | ACTIVE/INACTIVE/WITHDRAWN |
-| 13 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
-| 14 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+| 11 | balance | 잔액 | NUMERIC | 15,2 | - | - | Y | 0 | 충전 잔액 |
+| 12 | approval_status | 심사상태 | VARCHAR | 20 | - | - | Y | PENDING | PENDING/APPROVED/REJECTED |
+| 13 | status | 상태 | VARCHAR | 20 | - | - | Y | INACTIVE | ACTIVE/INACTIVE/WITHDRAWN |
+| 14 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 15 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
 
 ---
 
@@ -192,6 +206,51 @@
 | 5 | description | 설명 | VARCHAR | 500 | - | - | N | - | 등급 설명 |
 | 6 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
 | 7 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### prepaid_charge_request (선불금충전요청)
+> 회원 선불금 충전 요청 및 관리자 확인 이력
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 충전요청 고유 ID |
+| 2 | member_type | 회원타입 | VARCHAR | 20 | - | - | Y | - | INDIVIDUAL / CORPORATE |
+| 3 | member_id | 회원ID | BIGINT | - | - | - | Y | - | 충전 요청 회원 ID |
+| 4 | charge_amount | 충전금액 | NUMERIC | 15,2 | - | - | Y | - | 요청 충전 금액 |
+| 5 | deposit_date | 입금일 | DATE | - | - | - | N | - | 실제 입금 날짜 |
+| 6 | depositor_name | 입금자명 | VARCHAR | 100 | - | - | N | - | 은행 입금자명 |
+| 7 | status | 처리상태 | VARCHAR | 20 | - | - | Y | PENDING | PENDING / CONFIRMED / REJECTED |
+| 8 | confirmed_by | 확인관리자ID | BIGINT | - | - | - | N | - | 확인한 관리자 ID |
+| 9 | confirmed_at | 확인일시 | TIMESTAMP | - | - | - | N | - | 관리자 확인 일시 |
+| 10 | memo | 메모 | VARCHAR | 500 | - | - | N | - | 처리 메모 |
+| 11 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 요청 등록일시 |
+| 12 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+**상태 흐름:** `PENDING → CONFIRMED` (잔액 반영) / `PENDING → REJECTED`
+
+---
+
+### prepaid_refund_request (선불금환불요청)
+> 회원 선불금 환불 요청 및 처리 이력
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 환불요청 고유 ID |
+| 2 | member_type | 회원타입 | VARCHAR | 20 | - | - | Y | - | INDIVIDUAL / CORPORATE |
+| 3 | member_id | 회원ID | BIGINT | - | - | - | Y | - | 환불 요청 회원 ID |
+| 4 | refund_amount | 환불금액 | NUMERIC | 15,2 | - | - | Y | - | 요청 환불 금액 |
+| 5 | bank_name | 은행명 | VARCHAR | 100 | - | - | Y | - | 환불 수령 은행명 |
+| 6 | account_number | 계좌번호 | VARCHAR | 50 | - | - | Y | - | 환불 수령 계좌번호 |
+| 7 | account_holder | 예금주 | VARCHAR | 100 | - | - | Y | - | 계좌 예금주명 |
+| 8 | status | 처리상태 | VARCHAR | 20 | - | - | Y | PENDING | PENDING / CONFIRMED / REJECTED |
+| 9 | processed_by | 처리관리자ID | BIGINT | - | - | - | N | - | 처리한 관리자 ID |
+| 10 | processed_at | 처리일시 | TIMESTAMP | - | - | - | N | - | 처리 일시 |
+| 11 | memo | 메모 | VARCHAR | 500 | - | - | N | - | 처리 메모 |
+| 12 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 요청 등록일시 |
+| 13 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+**상태 흐름:** `PENDING → CONFIRMED` (잔액 차감 + 환불 처리) / `PENDING → REJECTED`
 
 ---
 
@@ -699,6 +758,195 @@
 
 ---
 
+## 도메인 9: 기초정보관리
+
+### individual_fare_rate (개인회원운임요율)
+> 개인회원 등급별 운임 할인/적용 요율
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | member_grade | 회원등급 | VARCHAR | 20 | - | - | Y | - | BASIC / SILVER / GOLD / VIP |
+| 3 | service_type | 서비스구분 | VARCHAR | 10 | - | - | Y | - | AIR / SEA / CIR / CCL |
+| 4 | fare_rate | 운임요율 | NUMERIC | 5,2 | - | - | Y | - | 적용 운임 요율 (%) |
+| 5 | effective_from | 적용시작일 | DATE | - | - | - | Y | - | 요율 적용 시작일 |
+| 6 | effective_to | 적용종료일 | DATE | - | - | - | N | - | 요율 적용 종료일 (NULL=현재적용중) |
+| 7 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 8 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### corporate_fare_rate (법인회원운임요율)
+> 법인별 맞춤 운임 적용 요율
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | corporate_id | 법인ID | BIGINT | - | - | FK(corporate.id) | Y | - | 대상 법인 ID |
+| 3 | service_type | 서비스구분 | VARCHAR | 10 | - | - | Y | - | AIR / SEA / CIR / CCL |
+| 4 | fare_rate | 운임요율 | NUMERIC | 5,2 | - | - | Y | - | 적용 운임 요율 (%) |
+| 5 | effective_from | 적용시작일 | DATE | - | - | - | Y | - | 요율 적용 시작일 |
+| 6 | effective_to | 적용종료일 | DATE | - | - | - | N | - | 요율 적용 종료일 (NULL=현재적용중) |
+| 7 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 8 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### exchange_rate (환율)
+> 서울외국환중개소 API 연계 환율 이력 저장
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | currency_code | 통화코드 | VARCHAR | 10 | - | - | Y | - | ISO 4217 통화코드 (예: USD, EUR) |
+| 3 | currency_name | 통화명 | VARCHAR | 100 | - | - | Y | - | 통화 명칭 |
+| 4 | base_rate | 기준환율 | NUMERIC | 15,4 | - | - | Y | - | 원화 기준 환율 (KRW/외화) |
+| 5 | rate_date | 기준일 | DATE | - | - | - | Y | - | 환율 기준 날짜 (영업일 오전 8시 기준) |
+| 6 | source | 출처 | VARCHAR | 50 | - | - | N | SEOUL_FX | 환율 출처 (서울외국환중개소) |
+| 7 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+
+---
+
+### air_transport (항공운송수단)
+> 항공 운송 구간 및 편명 관리
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | origin_country_code | 출발국가코드 | VARCHAR | 3 | - | FK(country_code) | Y | - | 출발 국가 코드 |
+| 3 | origin_airport_code | 출발공항코드 | VARCHAR | 10 | - | FK(airport_code) | Y | - | 출발 공항 코드 |
+| 4 | dest_country_code | 도착국가코드 | VARCHAR | 3 | - | FK(country_code) | Y | - | 도착 국가 코드 |
+| 5 | dest_airport_code | 도착공항코드 | VARCHAR | 10 | - | FK(airport_code) | Y | - | 도착 공항 코드 |
+| 6 | flight_name | 운송편명 | VARCHAR | 200 | - | - | Y | - | 항공 편명 또는 운항사명 |
+| 7 | use_yn | 사용여부 | CHAR | 1 | - | - | Y | Y | 사용여부 (Y/N) |
+| 8 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 9 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### air_transport_cost (항공운송원가)
+> 항공 운송수단별 부피/중량 기준 운송원가
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | air_transport_id | 항공운송수단ID | BIGINT | - | - | FK(air_transport.id) | Y | - | 소속 항공 운송수단 ID |
+| 3 | cost_type | 원가구분 | VARCHAR | 10 | - | - | Y | - | VOLUME (부피기준) / WEIGHT (중량기준) |
+| 4 | dim_x | 가로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 가로 (VOLUME 시 필수) |
+| 5 | dim_y | 세로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 세로 (VOLUME 시 필수) |
+| 6 | dim_z | 높이(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 높이 (VOLUME 시 필수) |
+| 7 | weight_kg | 중량(kg) | NUMERIC | 10,3 | - | - | N | - | 중량기준 중량 (WEIGHT 시 필수) |
+| 8 | cost_usd | 원가(USD) | NUMERIC | 15,4 | - | - | Y | - | 단위당 운송 원가 (USD) |
+| 9 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 10 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### sea_transport (해운운송수단)
+> 해운 운송 구간 및 선사 관리
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | origin_country_code | 출발국가코드 | VARCHAR | 3 | - | FK(country_code) | Y | - | 출발 국가 코드 |
+| 3 | origin_port_code | 출발항구코드 | VARCHAR | 10 | - | FK(port_code) | Y | - | 출발 항구 코드 |
+| 4 | dest_country_code | 도착국가코드 | VARCHAR | 3 | - | FK(country_code) | Y | - | 도착 국가 코드 |
+| 5 | dest_port_code | 도착항구코드 | VARCHAR | 10 | - | FK(port_code) | Y | - | 도착 항구 코드 |
+| 6 | vessel_name | 운송편명 | VARCHAR | 200 | - | - | Y | - | 선사명 또는 선박편명 |
+| 7 | use_yn | 사용여부 | CHAR | 1 | - | - | Y | Y | 사용여부 (Y/N) |
+| 8 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 9 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### sea_transport_cost (해운운송원가)
+> 해운 운송수단별 부피/중량 기준 운송원가
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | sea_transport_id | 해운운송수단ID | BIGINT | - | - | FK(sea_transport.id) | Y | - | 소속 해운 운송수단 ID |
+| 3 | cost_type | 원가구분 | VARCHAR | 10 | - | - | Y | - | VOLUME (부피기준) / WEIGHT (중량기준) |
+| 4 | dim_x | 가로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 가로 (VOLUME 시 필수) |
+| 5 | dim_y | 세로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 세로 (VOLUME 시 필수) |
+| 6 | dim_z | 높이(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 높이 (VOLUME 시 필수) |
+| 7 | weight_kg | 중량(kg) | NUMERIC | 10,3 | - | - | N | - | 중량기준 중량 (WEIGHT 시 필수) |
+| 8 | cost_usd | 원가(USD) | NUMERIC | 15,4 | - | - | Y | - | 단위당 운송 원가 (USD) |
+| 9 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 10 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### customs_broker (통관사)
+> 통관사 정보 및 API 연동 구분 관리
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | country_code | 국가코드 | VARCHAR | 3 | - | FK(country_code) | Y | - | 통관 대상 국가 코드 |
+| 3 | service_type | 서비스구분 | VARCHAR | 10 | - | - | Y | - | AIR / SEA |
+| 4 | entry_code | 통관입력코드 | VARCHAR | 10 | - | - | N | - | 세관 시스템 입력 코드 |
+| 5 | broker_name | 통관사명 | VARCHAR | 200 | - | - | Y | - | 통관사 명칭 |
+| 6 | api_integration | API연동구분 | CHAR | 3 | - | - | Y | OFF | ON / OFF |
+| 7 | use_yn | 사용여부 | CHAR | 1 | - | - | Y | Y | 사용여부 (Y/N) |
+| 8 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 9 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### customs_broker_cost (통관원가)
+> 통관사별 부피/중량 기준 통관원가
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | customs_broker_id | 통관사ID | BIGINT | - | - | FK(customs_broker.id) | Y | - | 소속 통관사 ID |
+| 3 | cost_type | 원가구분 | VARCHAR | 10 | - | - | Y | - | VOLUME (부피기준) / WEIGHT (중량기준) |
+| 4 | dim_x | 가로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 가로 (VOLUME 시 필수) |
+| 5 | dim_y | 세로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 세로 (VOLUME 시 필수) |
+| 6 | dim_z | 높이(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 높이 (VOLUME 시 필수) |
+| 7 | weight_kg | 중량(kg) | NUMERIC | 10,3 | - | - | N | - | 중량기준 중량 (WEIGHT 시 필수) |
+| 8 | cost_usd | 원가(USD) | NUMERIC | 15,4 | - | - | Y | - | 단위당 통관 원가 (USD) |
+| 9 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 10 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### courier_transport_cost (택배사운송원가)
+> 택배사별 부피/중량 기준 운송원가
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | courier_id | 택배사ID | BIGINT | - | - | FK(courier_company.id) | Y | - | 소속 택배사 ID |
+| 3 | cost_type | 원가구분 | VARCHAR | 10 | - | - | Y | - | VOLUME (부피기준) / WEIGHT (중량기준) |
+| 4 | dim_x | 가로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 가로 (VOLUME 시 필수) |
+| 5 | dim_y | 세로(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 세로 (VOLUME 시 필수) |
+| 6 | dim_z | 높이(cm) | NUMERIC | 10,2 | - | - | N | - | 부피기준 높이 (VOLUME 시 필수) |
+| 7 | weight_kg | 중량(kg) | NUMERIC | 10,3 | - | - | N | - | 중량기준 중량 (WEIGHT 시 필수) |
+| 8 | cost_usd | 원가(USD) | NUMERIC | 15,4 | - | - | Y | - | 단위당 운송 원가 (USD) |
+| 9 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 10 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
+### courier_waybill (택배배송장)
+> 택배사별 배송장 양식 파일 관리 (MinIO 저장)
+
+| No | 컬럼명(영문) | 컬럼명(한글) | 데이터타입 | 길이/정밀도 | PK | FK | NOT NULL | 기본값 | 설명 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | id | 고유ID | BIGSERIAL | - | PK | - | Y | - | 고유 ID |
+| 2 | courier_id | 택배사ID | BIGINT | - | - | FK(courier_company.id) | Y | - | 소속 택배사 ID |
+| 3 | country_code | 국가코드 | VARCHAR | 3 | - | FK(country_code) | Y | - | 적용 국가 코드 |
+| 4 | file_name | 파일명 | VARCHAR | 255 | - | - | Y | - | 원본 파일명 |
+| 5 | file_path | 파일경로 | VARCHAR | 500 | - | - | Y | - | MinIO 저장 경로 |
+| 6 | file_size | 파일크기 | BIGINT | - | - | - | N | - | 파일 크기 (bytes) |
+| 7 | description | 설명 | VARCHAR | 500 | - | - | N | - | 배송장 양식 설명 |
+| 8 | created_at | 등록일시 | TIMESTAMP | - | - | - | Y | NOW() | 등록일시 |
+| 9 | updated_at | 수정일시 | TIMESTAMP | - | - | - | Y | NOW() | 최종수정일시 |
+
+---
+
 ## 주요 Enum 값 요약
 
 | 구분 | 컬럼 | 값 |
@@ -712,6 +960,11 @@
 | 청구서 상태 | invoice.invoice_status | UNPAID / PARTIAL / PAID |
 | 알림 발송상태 | notification.send_status | PENDING / SENT / FAILED |
 | VOC 처리상태 | voc.status | OPEN / IN_PROGRESS / CLOSED |
+| 선불금 충전상태 | prepaid_charge_request.status | PENDING / CONFIRMED / REJECTED |
+| 선불금 환불상태 | prepaid_refund_request.status | PENDING / CONFIRMED / REJECTED |
+| 운송원가 구분 | *.cost_type | VOLUME (부피기준) / WEIGHT (중량기준) |
+| 통관사 API연동 | customs_broker.api_integration | ON / OFF |
+| 회원타입 구분 | *.member_type | INDIVIDUAL / CORPORATE |
 | 번호 형식 | order_no | ORD-YYYYMMDD-NNNNN |
 | 번호 형식 | master_order_no | MO-YYYYMMDD-NNNNN |
 | 번호 형식 | invoice_no | INV-YYYYMMDD-NNNNN |
